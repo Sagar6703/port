@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -111,6 +72,8 @@
       margin: 20px auto;
       display: block;
       background-color: #fff;
+      z-index: 10;
+      position: relative;
     }
     .modal {
       display: none;
@@ -193,7 +156,7 @@
       <h2 class="text-4xl font-bold text-center mb-12 text-white" data-aos="fade-up">My Projects</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div class="project-card bg-white p-6 rounded-lg shadow-lg dark-mode:bg-gray-800" data-aos="zoom-in">
-          <img src="1pro.png"text=National+Anthems" alt="National Anthems" class="w-full h-48 object-cover rounded-t-lg mb-4">
+          <img src="1pro.png" alt="National Anthems" class="w-full h-48 object-cover rounded-t-lg mb-4">
           <h3 class="text-xl font-semibold mb-2">National Anthems Clustering</h3>
           <p class="text-gray-600 dark-mode:text-gray-300 mb-4">
             Clustered national anthems using unsupervised learning, analyzing lyrics and musical features. Visualized insights with Tableau and Power BI.
@@ -201,7 +164,7 @@
           <button class="text-blue-500 font-semibold hover:underline" onclick="openModal('anthems')">View Details</button>
         </div>
         <div class="project-card bg-white p-6 rounded-lg shadow-lg dark-mode:bg-gray-800" data-aos="zoom-in" data-aos-delay="100">
-          <img src="2pro.jpeg"text=Wireless+Charger" alt="Wireless Charger" class="w-full h-48 object-cover rounded-t-lg mb-4">
+          <img src="2pro.jpeg" alt="Wireless Charger" class="w-full h-48 object-cover rounded-t-lg mb-4">
           <h3 class="text-xl font-semibold mb-2">Wireless Charger</h3>
           <p class="text-gray-600 dark-mode:text-gray-300 mb-4">
             Built a wireless charger with copper coils, MosFET, and BJT, optimizing power efficiency through quantitative research.
@@ -209,7 +172,7 @@
           <button class="text-blue-500 font-semibold hover:underline" onclick="openModal('charger')">View Details</button>
         </div>
         <div class="project-card bg-white p-6 rounded-lg shadow-lg dark-mode:bg-gray-800" data-aos="zoom-in" data-aos-delay="200">
-          <img src="3pro.jpeg"text=Stock+Dashboard" alt="Stock Dashboard" class="w-full h-48 object-cover rounded-t-lg mb-4">
+          <img src="3pro.jpeg" alt="Stock Dashboard" class="w-full h-48 object-cover rounded-t-lg mb-4">
           <h3 class="text-xl font-semibold mb-2">Stock Market Dashboard</h3>
           <p class="text-gray-600 dark-mode:text-gray-300 mb-4">
             Created interactive dashboards with Flourish and Power BI to track BSE Sensex trends and historical stock data.
@@ -378,7 +341,7 @@
       if (project === 'anthems') {
         modalContent.innerHTML = `
           <h3 class="text-2xl font-bold mb-4">National Anthems Clustering</h3>
-          <img src="https://via.placeholder.com/600x300?text=National+Anthems" alt="National Anthems" class="w-full h-48 object-cover rounded-lg mb-4">
+          <img src="1pro.png" alt="National Anthems" class="w-full h-48 object-cover rounded-lg mb-4">
           <p class="text-gray-600 dark-mode:text-gray-300">
             Used unsupervised learning to cluster national anthems based on lyrics and musical features. Visualized patterns in thematic and musical structures using Tableau and Power BI.
             <ul class="list-disc list-inside mt-2">
@@ -391,7 +354,7 @@
       } else if (project === 'charger') {
         modalContent.innerHTML = `
           <h3 class="text-2xl font-bold mb-4">Wireless Charger</h3>
-          <img src="https://via.placeholder.com/600x300?text=Wireless+Charger" alt="Wireless Charger" class="w-full h-48 object-cover rounded-lg mb-4">
+          <img src="2pro.jpeg" alt="Wireless Charger" class="w-full h-48 object-cover rounded-lg mb-4">
           <p class="text-gray-600 dark-mode:text-gray-300">
             Designed a wireless charger using copper coils, MosFET, and BJT components. Conducted quantitative research to optimize power efficiency.
             <ul class="list-disc list-inside mt-2">
@@ -404,7 +367,7 @@
       } else if (project === 'dashboard') {
         modalContent.innerHTML = `
           <h3 class="text-2xl font-bold mb-4">Stock Market Dashboard</h3>
-          <img src="https://via.placeholder.com/600x300?text=Stock+Dashboard" alt="Stock Dashboard" class="w-full h-48 object-cover rounded-lg mb-4">
+          <img src="3pro.jpeg" alt="Stock Dashboard" class="w-full h-48 object-cover rounded-lg mb-4">
           <p class="text-gray-600 dark-mode:text-gray-300">
             Developed interactive dashboards using Flourish and Power BI to analyze BSE Sensex performance and historical stock data.
             <ul class="list-disc list-inside mt-2">
@@ -429,26 +392,31 @@
     const cellSize = canvas.width / 3;
 
     function drawBoard() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = '#1E90FF';
-      ctx.lineWidth = 5;
-      ctx.beginPath();
-      ctx.moveTo(cellSize, 0); ctx.lineTo(cellSize, canvas.height); ctx.stroke();
-      ctx.moveTo(cellSize * 2, 0); ctx.lineTo(cellSize * 2, canvas.height); ctx.stroke();
-      ctx.moveTo(0, cellSize); ctx.lineTo(canvas.width, cellSize); ctx.stroke();
-      ctx.moveTo(0, cellSize * 2); ctx.lineTo(canvas.width, cellSize * 2); ctx.stroke();
-      for (let i = 0; i < 9; i++) {
-        const row = Math.floor(i / 3);
-        const col = i % 3;
-        const x = col * cellSize + cellSize / 2;
-        const y = row * cellSize + cellSize / 2;
-        ctx.fillStyle = '#1E90FF';
-        ctx.font = '60px Poppins';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(board[i], x, y);
+      try {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#1E90FF';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(cellSize, 0); ctx.lineTo(cellSize, canvas.height); ctx.stroke();
+        ctx.moveTo(cellSize * 2, 0); ctx.lineTo(cellSize * 2, canvas.height); ctx.stroke();
+        ctx.moveTo(0, cellSize); ctx.lineTo(canvas.width, cellSize); ctx.stroke();
+        ctx.moveTo(0, cellSize * 2); ctx.lineTo(canvas.width, cellSize * 2); ctx.stroke();
+        for (let i = 0; i < 9; i++) {
+          const row = Math.floor(i / 3);
+          const col = i % 3;
+          const x = col * cellSize + cellSize / 2;
+          const y = row * cellSize + cellSize / 2;
+          ctx.fillStyle = '#1E90FF';
+          ctx.font = '60px Poppins';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(board[i], x, y);
+        }
+        console.log('Board drawn successfully');
+      } catch (e) {
+        console.error('Error drawing board:', e);
       }
     }
     function checkWin() {
@@ -467,26 +435,31 @@
     }
     function handleClick(event) {
       if (!gameActive) return;
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      const x = (event.clientX - rect.left) * scaleX;
-      const y = (event.clientY - rect.top) * scaleY;
-      const col = Math.floor(x / cellSize);
-      const row = Math.floor(y / cellSize);
-      const index = row * 3 + col;
-      if (index >= 0 && index < 9 && board[index] === '') {
-        board[index] = currentPlayer;
-        drawBoard();
-        const result = checkWin();
-        if (result) {
-          gameActive = false;
-          setTimeout(() => {
-            alert(result === 'Draw' ? 'It\'s a Draw!' : `${result} Wins!`);
-          }, 100);
+      try {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const col = Math.floor(x / cellSize);
+        const row = Math.floor(y / cellSize);
+        const index = row * 3 + col;
+        console.log(`Clicked: x=${x}, y=${y}, row=${row}, col=${col}, index=${index}`);
+        if (index >= 0 && index < 9 && board[index] === '') {
+          board[index] = currentPlayer;
+          drawBoard();
+          const result = checkWin();
+          if (result) {
+            gameActive = false;
+            setTimeout(() => {
+              alert(result === 'Draw' ? 'It\'s a Draw!' : `${result} Wins!`);
+            }, 100);
+          } else {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+          }
         } else {
-          currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+          console.log('Invalid move:', { index, board });
         }
+      } catch (e) {
+        console.error('Error handling click:', e);
       }
     }
     function resetGame() {
@@ -494,10 +467,24 @@
       currentPlayer = 'X';
       gameActive = true;
       drawBoard();
+      console.log('Game reset');
     }
     canvas.addEventListener('click', handleClick);
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const simulatedClick = new MouseEvent('click', {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+      });
+      canvas.dispatchEvent(simulatedClick);
+    });
     document.getElementById('reset-game').addEventListener('click', resetGame);
-    drawBoard();
+    try {
+      drawBoard();
+    } catch (e) {
+      console.error('Initial draw failed:', e);
+    }
   </script>
 </body>
 </html>
